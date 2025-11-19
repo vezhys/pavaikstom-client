@@ -1,0 +1,257 @@
+<template>
+  <AppLayout>
+    <PageCard title="Tour Routes">
+      <template #actions>
+        <button v-if="authStore.canManage" @click="openCreateModal" class="btn btn-primary">
+          Create New Route
+        </button>
+      </template>
+
+      <!-- Loading State -->
+      <div v-if="loading" class="loading">Loading routes...</div>
+
+      <!-- Error State -->
+      <div v-if="error" class="error-message">
+        {{ error }}
+      </div>
+
+      <!-- Routes Table -->
+      <table v-if="!loading && routes.length > 0" class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Points of Interest</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="route in routes" :key="route.id">
+            <td>
+              <strong>{{ route.name }}</strong>
+            </td>
+            <td>{{ route.description }}</td>
+            <td>{{ route.poiCount || 0 }}</td>
+            <td>
+              <div class="table-actions">
+                <button
+                  @click="viewPOIs(route.id)"
+                  class="btn btn-primary btn-sm"
+                  v-if="route.poiCount > 0"
+                >
+                  View POIs
+                </button>
+                <button
+                  v-if="authStore.canManage"
+                  @click="openEditModal(route)"
+                  class="btn btn-secondary btn-sm"
+                >
+                  Edit
+                </button>
+                <button
+                  v-if="authStore.canManage"
+                  @click="deleteRoute(route.id)"
+                  class="btn btn-danger btn-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div v-if="!loading && routes.length === 0" class="empty-state">
+        No routes created yet. Create your first tour route!
+      </div>
+    </PageCard>
+
+    <!-- Modal for Create/Edit -->
+    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <h2>{{ isEditing ? 'Edit Route' : 'Create New Route' }}</h2>
+
+        <ModalError v-model="modalError" />
+
+        <form @submit.prevent="saveRoute">
+          <div class="form-group">
+            <label>Route Name</label>
+            <input
+              v-model="form.name"
+              type="text"
+              placeholder="e.g., Historic City Center Tour"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea
+              v-model="form.description"
+              rows="3"
+              placeholder="Describe this tour route..."
+              required
+            ></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" @click="closeModal" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary" :disabled="saving">
+              {{ saving ? 'Saving...' : 'Save Route' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </AppLayout>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import AppLayout from '@/components/AppLayout.vue'
+import PageCard from '@/components/PageCard.vue'
+import { itemService } from '@/services/itemService'
+import ModalError from '@/components/ModalError.vue'
+import { useAuthStore } from '@/stores/auth'
+const router = useRouter()
+
+const authStore = useAuthStore()
+const routes = ref([])
+const loading = ref(false)
+const error = ref('')
+const showModal = ref(false)
+const isEditing = ref(false)
+const saving = ref(false)
+const form = ref({
+  id: null,
+  name: '',
+  description: '',
+})
+// Fetch all routes
+const fetchRoutes = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    routes.value = await itemService.getAll()
+  } catch (err) {
+    error.value = 'Failed to load routes'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Open create modal
+const openCreateModal = () => {
+  isEditing.value = false
+  form.value = { id: null, name: '', description: '' }
+  showModal.value = true
+}
+
+// Open edit modal
+const openEditModal = (route) => {
+  isEditing.value = true
+  form.value = { ...route }
+  showModal.value = true
+}
+
+// Close modal
+const closeModal = () => {
+  showModal.value = false
+  form.value = { id: null, name: '', description: '' }
+}
+
+// Save route (create or update)
+const saveRoute = async () => {
+  saving.value = true
+  error.value = ''
+  try {
+    if (isEditing.value) {
+      await itemService.update(form.value.id, form.value)
+    } else {
+      await itemService.create(form.value)
+    }
+    closeModal()
+    await fetchRoutes()
+  } catch (err) {
+    error.value = 'Failed to save route'
+    console.error(err)
+  } finally {
+    saving.value = false
+  }
+}
+
+// View POIs for a route
+const viewPOIs = (routeId) => {
+  router.push({ path: '/points-of-interest', query: { tourId: routeId } })
+}
+
+// Delete route
+const deleteRoute = async (id) => {
+  if (!confirm('Are you sure you want to delete this route?')) return
+
+  try {
+    await itemService.delete(id)
+    await fetchRoutes()
+  } catch (err) {
+    error.value = 'Failed to delete route'
+    console.error(err)
+  }
+}
+
+// Load routes on mount
+onMounted(() => {
+  fetchRoutes()
+})
+</script>
+
+<style scoped>
+.table-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+  min-width: 70px;
+}
+
+/* Column width distribution */
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+  width: 20%;
+  min-width: 150px;
+}
+
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) {
+  width: 45%;
+  min-width: 200px;
+}
+
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) {
+  width: 15%;
+  min-width: 120px;
+  text-align: center;
+}
+
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) {
+  width: 20%;
+  min-width: 180px;
+}
+
+.data-table td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  vertical-align: top;
+}
+
+.data-table td:nth-child(2) {
+  line-height: 1.5;
+  max-width: 1048px;
+}
+</style>
