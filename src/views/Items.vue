@@ -81,8 +81,10 @@
               v-model="form.name"
               type="text"
               placeholder="e.g., Historic City Center Tour"
+              maxlength="50"
               required
             />
+             <small>{{ form.name.length }}/15</small>
           </div>
           <div class="form-group">
             <label>Description</label>
@@ -90,9 +92,38 @@
               v-model="form.description"
               rows="3"
               placeholder="Describe this tour route..."
+               maxlength="500"
               required
             ></textarea>
+             <small>{{ form.description.length }}/500</small>
           </div>
+
+         <div class="form-group">
+          <label>Date</label>
+          <input
+            type="date"
+            v-model="form.date"
+            required
+          />
+          <span v-if="form.date && new Date(form.date) < new Date()" class="text-danger">
+            Date cannot be in the past
+          </span>
+        </div>
+        <div class="form-group">
+
+        <label>Duration (hours)</label>
+        <input
+          type="number"
+          v-model.number="form.duration"
+          min="1"
+          max="168"
+          required
+        />
+        <span v-if="form.duration && (form.duration < 1 || form.duration > 168)" class="text-danger">
+          Duration must be between 1 and 168 hours
+        </span>
+      </div>
+        <ModalError v-model="modalError" />
           <div class="modal-actions">
             <button type="button" @click="closeModal" class="btn btn-secondary">Cancel</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
@@ -122,10 +153,13 @@ const error = ref('')
 const showModal = ref(false)
 const isEditing = ref(false)
 const saving = ref(false)
+const modalError = ref('')
 const form = ref({
   id: null,
   name: '',
   description: '',
+  date: '',
+  duration: '',
 })
 // Fetch all routes
 const fetchRoutes = async () => {
@@ -144,21 +178,30 @@ const fetchRoutes = async () => {
 // Open create modal
 const openCreateModal = () => {
   isEditing.value = false
-  form.value = { id: null, name: '', description: '' }
+   modalError.value = ''
+  form.value = { id: null, name: '', description: '', date: '', duration: 1 }
   showModal.value = true
 }
 
 // Open edit modal
 const openEditModal = (route) => {
+   modalError.value = ''
   isEditing.value = true
-  form.value = { ...route }
+  form.value = {
+    id: route.id ?? null,
+    name: route.name ?? '',
+    description: route.description ?? '',
+    date: route.date ? route.date.split('T')[0] : '',
+    duration: Number(route.duration ?? 1)
+  }
   showModal.value = true
 }
 
 // Close modal
 const closeModal = () => {
   showModal.value = false
-  form.value = { id: null, name: '', description: '' }
+  form.value = { id: null, name: '', description: '', date: '', duration: 1 }
+  modalError.value = ''
 }
 
 // Save route (create or update)
@@ -174,7 +217,7 @@ const saveRoute = async () => {
     closeModal()
     await fetchRoutes()
   } catch (err) {
-    error.value = 'Failed to save route'
+    modalError.value = err.response?.data?.error ?? err.response?.data?.message ?? "Failed to save route."
     console.error(err)
   } finally {
     saving.value = false
