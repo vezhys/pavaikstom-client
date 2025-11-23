@@ -2,7 +2,8 @@ import axios from 'axios';
 import { useAuthStore } from '../stores/auth';
 
 export const api = axios.create({
-  baseURL: 'https://localhost:44367/api',
+  //baseURL: 'https://localhost:44367/api',\
+  baseURL: 'https://spazieren-api-ezfef0h6h8bkaed6.germanywestcentral-01.azurewebsites.net/api',
   headers: {
     'Content-Type': 'application/json'
   },
@@ -35,7 +36,7 @@ api.interceptors.response.use(
         console.log("retrieved refresh token: " + refreshToken)
         // Create a new axios instance WITHOUT interceptors for refresh call
         const refreshResponse = await axios.post(
-          'https://localhost:44367/api/auth/refresh',
+          'https://spazieren-api-ezfef0h6h8bkaed6.germanywestcentral-01.azurewebsites.net/api/auth/refresh',
           { RefreshToken: refreshToken },
           { 
             headers: { 'Content-Type': 'application/json' },
