@@ -41,9 +41,9 @@
             <td>{{ getPoiName(card.pointId) }}</td>
             <td>
               <div class="table-actions">
-                <button v-if="(canEdit(card))" @click="openEditModal(card)"
+                <button v-if="(canEditButton(card))" @click="openEditModal(card)"
                   class="btn btn-secondary btn-sm">Edit</button>
-                <button v-if="(canEdit(card))" @click="deleteCard(card.id)"
+                <button v-if="(canEditButton(card))" @click="deleteCard(card.id)"
                   class="btn btn-danger btn-sm">Delete</button>
               </div>
             </td>
@@ -159,7 +159,10 @@ const fetchOwnedCards = async () => {
   }
 }
 
-const canEdit = (card) => {
+const canEditButton = (card) => {
+  return canEdit(card)
+}
+function canEdit(card) {
   return myCards.value.some(t => t.id === card.id)
 }
 

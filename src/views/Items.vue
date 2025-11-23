@@ -37,7 +37,7 @@
                 <button @click="viewPOIs(route.id)" class="btn btn-primary btn-sm" v-if="route.poiCount > 0">
                   View POIs
                 </button>
-                <button v-if="(authStore.canManage && canEdit(route)) || authStore.canManageUsers"
+                <button v-if="(authStore.canManage && canEditButton(route)) || authStore.canManageUsers"
                   @click="openEditModal(route)" class="btn btn-secondary btn-sm">
                   Edit
                 </button>
@@ -158,7 +158,12 @@ const fetchOwnedRoutes = async () => {
   }
 }
 
-const canEdit = (tour) => {
+const canEditButton = (tour) => {
+  return canEdit(tour)
+}
+
+
+function canEdit(tour) {
   return ownedTours.value.some(t => t.id === tour.id)
 }
 
