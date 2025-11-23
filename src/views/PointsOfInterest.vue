@@ -38,7 +38,7 @@
               <strong>{{ poi.name }}</strong>
             </td>
             <td>{{ getRouteName(poi.tourId) }}</td>
-            <td>{{ poi.cardCount || 0 }}</td>
+            <td>{{ poi.infoCardCount || 0 }}</td>
             <td>
               <div class="table-actions">
                 <button @click="viewCards(poi.id)" class="btn btn-primary btn-sm" v-if="poi.cardCount > 0">
