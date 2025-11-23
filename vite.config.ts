@@ -15,7 +15,7 @@ export default defineConfig({
    server: {
     proxy: {
       '/api': {
-        target: 'https://localhost:44367', // your ASP.NET backend URL
+        target: 'https://spazieren-api-ezfef0h6h8bkaed6.germanywestcentral-01.azurewebsites.net', // your ASP.NET backend URL
         changeOrigin: true,
         secure: false,
       },
