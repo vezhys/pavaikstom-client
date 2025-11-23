@@ -44,7 +44,8 @@
                 <button @click="viewCards(poi.id)" class="btn btn-primary btn-sm" v-if="poi.cardCount > 0">
                   View Cards
                 </button>
-                <button v-if="canEdit(poi)" @click="openEditModal(poi)" class="btn btn-secondary btn-sm">Edit</button>
+                <button v-if="canEditButton(poi)" @click="openEditModal(poi)"
+                  class="btn btn-secondary btn-sm">Edit</button>
                 <button v-if="canEdit(poi)" @click="deletePoi(poi.id)" class="btn btn-danger btn-sm">Delete</button>
               </div>
             </td>
@@ -156,6 +157,11 @@ const fetchOwnedPois = async () => {
 }
 function canEdit(poi) {
   return myPois.value.some(t => t.id === poi.id)
+}
+
+
+const canEditButton = (poi) => {
+  return canEdit(poi)
 }
 
 
