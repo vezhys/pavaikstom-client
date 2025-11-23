@@ -155,7 +155,7 @@ const fetchOwnedPois = async () => {
   }
 }
 function canEdit(poi) {
-  return myPoys.value.some(t => t.id === poi.id)
+  return myPois.value.some(t => t.id === poi.id)
 }
 
 
