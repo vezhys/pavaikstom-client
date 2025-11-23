@@ -31,6 +31,9 @@ api.interceptors.response.use(
       
       try {
         const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) {
+          return Promise.reject(error);
+          }
         console.log("retrieved refresh token: " + refreshToken)
         const refreshResponse = await axios.post(
           'https://spazieren-api-ezfef0h6h8bkaed6.germanywestcentral-01.azurewebsites.net/api/auth/refresh',
