@@ -3,7 +3,7 @@ import { useAuthStore } from '../stores/auth';
 
 export const authService = {
   async login(username: any, password: any) {
-    const response = await api.post('/Auth/login', { username, password })
+    const response = await api.post('/auth/login', { username, password })
     const { accessToken, refreshToken } = response.data
     localStorage.setItem('accessToken', accessToken)
     localStorage.setItem('refreshToken', refreshToken)
