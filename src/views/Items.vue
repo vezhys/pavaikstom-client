@@ -34,25 +34,14 @@
             <td>{{ route.poiCount || 0 }}</td>
             <td>
               <div class="table-actions">
-                <button
-                  @click="viewPOIs(route.id)"
-                  class="btn btn-primary btn-sm"
-                  v-if="route.poiCount > 0"
-                >
+                <button @click="viewPOIs(route.id)" class="btn btn-primary btn-sm" v-if="route.poiCount > 0">
                   View POIs
                 </button>
-                <button
-                  v-if="authStore.canManage"
-                  @click="openEditModal(route)"
-                  class="btn btn-secondary btn-sm"
-                >
+                <button v-if="authStore.canManage && canEdit(route)" @click="openEditModal(route)"
+                  class="btn btn-secondary btn-sm">
                   Edit
                 </button>
-                <button
-                  v-if="authStore.canManage"
-                  @click="deleteRoute(route.id)"
-                  class="btn btn-danger btn-sm"
-                >
+                <button v-if="authStore.canManage" @click="deleteRoute(route.id)" class="btn btn-danger btn-sm">
                   Delete
                 </button>
               </div>
@@ -77,53 +66,33 @@
         <form @submit.prevent="saveRoute">
           <div class="form-group">
             <label>Route Name</label>
-            <input
-              v-model="form.name"
-              type="text"
-              placeholder="e.g., Historic City Center Tour"
-              maxlength="50"
-              required
-            />
-             <small>{{ form.name.length }}/15</small>
+            <input v-model="form.name" type="text" placeholder="e.g., Historic City Center Tour" maxlength="50"
+              required />
+            <small>{{ form.name.length }}/15</small>
           </div>
           <div class="form-group">
             <label>Description</label>
-            <textarea
-              v-model="form.description"
-              rows="3"
-              placeholder="Describe this tour route..."
-               maxlength="500"
-              required
-            ></textarea>
-             <small>{{ form.description.length }}/500</small>
+            <textarea v-model="form.description" rows="3" placeholder="Describe this tour route..." maxlength="500"
+              required></textarea>
+            <small>{{ form.description.length }}/500</small>
           </div>
 
-         <div class="form-group">
-          <label>Date</label>
-          <input
-            type="date"
-            v-model="form.date"
-            required
-          />
-          <span v-if="form.date && new Date(form.date) < new Date()" class="text-danger">
-            Date cannot be in the past
-          </span>
-        </div>
-        <div class="form-group">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" v-model="form.date" required />
+            <span v-if="form.date && new Date(form.date) < new Date()" class="text-danger">
+              Date cannot be in the past
+            </span>
+          </div>
+          <div class="form-group">
 
-        <label>Duration (hours)</label>
-        <input
-          type="number"
-          v-model.number="form.duration"
-          min="1"
-          max="168"
-          required
-        />
-        <span v-if="form.duration && (form.duration < 1 || form.duration > 168)" class="text-danger">
-          Duration must be between 1 and 168 hours
-        </span>
-      </div>
-        <ModalError v-model="modalError" />
+            <label>Duration (hours)</label>
+            <input type="number" v-model.number="form.duration" min="1" max="168" required />
+            <span v-if="form.duration && (form.duration < 1 || form.duration > 168)" class="text-danger">
+              Duration must be between 1 and 168 hours
+            </span>
+          </div>
+          <ModalError v-model="modalError" />
           <div class="modal-actions">
             <button type="button" @click="closeModal" class="btn btn-secondary">Cancel</button>
             <button type="submit" class="btn btn-primary" :disabled="saving">
@@ -175,17 +144,34 @@ const fetchRoutes = async () => {
   }
 }
 
+const fetchOwnedRoutes = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    routes.value = await itemService.getOwned()
+  } catch (err) {
+    error.value = 'Failed to load owned routes'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+}
+
+function canEdit(tour) {
+  return ownedTours.value.some(t => t.id === tour.id)
+}
+
 // Open create modal
 const openCreateModal = () => {
   isEditing.value = false
-   modalError.value = ''
+  modalError.value = ''
   form.value = { id: null, name: '', description: '', date: '', duration: 1 }
   showModal.value = true
 }
 
 // Open edit modal
 const openEditModal = (route) => {
-   modalError.value = ''
+  modalError.value = ''
   isEditing.value = true
   form.value = {
     id: route.id ?? null,
@@ -237,14 +223,18 @@ const deleteRoute = async (id) => {
     await itemService.delete(id)
     await fetchRoutes()
   } catch (err) {
-    error.value = 'Failed to delete route'
+    if (err.response?.status === 403)
+      error.value = 'You cannot delete tours that you do not own.'
+    else
+      error.value = 'Failed to delete route'
     console.error(err)
   }
 }
 
 // Load routes on mount
 onMounted(() => {
-  fetchRoutes()
+  fetchRoutes(),
+    fetchOwnedRoutes()
 })
 </script>
 
