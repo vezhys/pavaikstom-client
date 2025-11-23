@@ -7,10 +7,8 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  withCredentials: true,
 });
 
-axios.defaults.withCredentials = true;
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
@@ -34,13 +32,11 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         console.log("retrieved refresh token: " + refreshToken)
-        // Create a new axios instance WITHOUT interceptors for refresh call
         const refreshResponse = await axios.post(
           'https://spazieren-api-ezfef0h6h8bkaed6.germanywestcentral-01.azurewebsites.net/api/auth/refresh',
           { RefreshToken: refreshToken },
           { 
-            headers: { 'Content-Type': 'application/json' },
-            withCredentials: true
+            headers: { 'Content-Type': 'application/json' }
           }
         );
         
