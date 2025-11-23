@@ -3,10 +3,12 @@
     {
       "route": "/api/*",
       "allowedRoles": ["anonymous"]
-    },
+    }],
+
+  "navigationFallback":
     {
-      "route": "/*",
-      "rewrite": "/index.html"
+      "rewrite": "/index.html",
+    "exclude": ["/api/*", "/assets/*", "/favicon.ico"]
     }
-  ]
+  
 }

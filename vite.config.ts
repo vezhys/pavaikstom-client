@@ -12,15 +12,7 @@ export default defineConfig({
     vueJsx(),
     vueDevTools(),
   ],
-   server: {
-    proxy: {
-      '/api': {
-        target: 'https://spazieren-api-ezfef0h6h8bkaed6.germanywestcentral-01.azurewebsites.net', // your ASP.NET backend URL
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
+
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
