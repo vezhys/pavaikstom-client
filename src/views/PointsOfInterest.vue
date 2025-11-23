@@ -251,6 +251,7 @@ onMounted(() => {
   fetchRoutes()
   fetcMyRoutes()
   fetchPois()
+  fetchOwnedPois()
 })
 
 // Watch for route query changes
