@@ -12,12 +12,7 @@
           <label>Password</label>
           <input v-model="password" type="password" required />
         </div>
-        <button
-          type="submit"
-          class="btn btn-primary"
-          :disabled="loading"
-          style="width: 100%; margin-top: 8px"
-        >
+        <button type="submit" class="btn btn-primary" :disabled="loading" style="width: 100%; margin-top: 8px">
           {{ loading ? 'Logging in...' : 'Login' }}
         </button>
         <div class="register-link">
@@ -51,7 +46,7 @@ const handleLogin = async () => {
     await authStore.login(username.value, password.value)
     router.push('/')
   } catch (err: any) {
-    error.value = (err as any).response?.data?.message || 'Login failed'
+    error.value = (err as any).response?.data?.message || 'Login failed - check your username and password.'
   } finally {
     loading.value = false
   }
