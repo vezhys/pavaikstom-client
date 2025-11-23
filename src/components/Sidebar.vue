@@ -35,6 +35,15 @@
       >
         <span>Information Cards</span>
       </router-link>
+
+      <router-link
+        v-if="authStore.canManageUsers"
+        to="/users"
+        class="nav-item"
+        active-class="active"
+      >
+        <span>Users</span>
+      </router-link>
     </nav>
 
     <div class="user-section" v-show="isOpen">

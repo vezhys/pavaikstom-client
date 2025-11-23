@@ -4,13 +4,15 @@
       <h1 class="register-title">Tour Manager</h1>
       <p class="register-subtitle">Create your account</p>
       <form @submit.prevent="handleRegister" class="register-form">
+        
         <div class="form-group">
           <label>Username</label>
           <input v-model="userName" type="text" required />
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input v-model="email" type="email" required />
+          <input v-model="email" type="text" required />
+          <span class="text-danger" v-if="emailError">{{ emailError }}</span>
         </div>
         <div class="form-group">
           <label>Password</label>
@@ -38,6 +40,7 @@
         <div v-if="error" class="error-message" style="margin-top: 16px">
           {{ error }}
         </div>
+        <ModalError v-model="modalError" />
         <div class="login-link">
           Already have an account? <router-link to="/login">Login here</router-link>
         </div>
@@ -51,6 +54,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
+import ModalError from '@/components/ModalError.vue'
+
 const router = useRouter()
 const authStore = useAuthStore()
 
@@ -61,8 +66,17 @@ const confirmPassword = ref('')
 const role = ref('User')
 const loading = ref(false)
 const error = ref('')
+const emailError = ref('')
+const modalError = ref('')
 
 const handleRegister = async () => {
+  
+  const emailValid = validateEmail()
+  if (!emailValid){
+   error.value = 'Email is invalid'
+    return
+  }
+
   if (password.value !== confirmPassword.value) {
     error.value = 'Passwords do not match'
     return
@@ -75,15 +89,30 @@ const handleRegister = async () => {
     await authStore.register(userName.value, email.value, password.value, role.value)
     router.push('/')
   } catch (err: any) {
-    const errors = err.response?.data?.errors
-    if (errors && Array.isArray(errors)) {
-      error.value = errors.map((e: any) => e.description || e).join(', ')
-    } else {
-      error.value = err.response?.data?.message || 'Registration failed'
-    }
-  } finally {
-    loading.value = false
+     const data = err.response?.data
+
+  if (Array.isArray(data)) {
+    error.value = data.map((e: any) => e.description || e).join(', ')
+  } else if (data?.errors && Array.isArray(data.errors)) {
+    error.value = data.errors.map((e: any) => e.description || e).join(', ')
+  } else {
+    error.value = data?.message || 'Registration failed'
   }
+}
+finally {
+  loading.value = false
+}
+}
+
+const validateEmail = () => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!re.test(email.value)) {
+    emailError.value = 'Please enter a valid email address'
+    return false
+  }
+  
+  emailError.value = ''
+  return true
 }
 </script>
 
@@ -96,7 +125,13 @@ const handleRegister = async () => {
   background: linear-gradient(135deg, #2a2520 0%, #362f28 100%);
   padding: 20px;
 }
-
+.error-text {
+  display: block;
+  color: #ff6b6b;
+  font-size: 12px;
+  margin-top: 4px;
+  font-family: 'Trebuchet MS', sans-serif;
+}
 .register-card {
   background: rgba(0, 0, 0, 0.3);
   border: 2px solid #5a4a38;

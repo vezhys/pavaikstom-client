@@ -9,13 +9,14 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   getters: {
+    //isAuthenticated: (state) => !!state.user || !!authService.getToken(),
     canManage(state) {
       const role = state.user?.role
-      return role === 'admin' || role === 'Guide'
+      return role === 'Admin' || role === 'Guide'
     },
     canManageUsers(state) {
       const role = state.user?.role
-      return role === 'admin'
+      return role === 'Admin'
     },
   },
   actions: {
@@ -58,15 +59,17 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         console.error('Failed to fetch user', error)
         this.user = null
+        this.isAuthenticated = false
       }
     },
 
     async refreshToken() {
       try {
-       authService.refresh();
+        authService.refresh();
         this.isAuthenticated = true;
       } catch (err) {
         this.isAuthenticated = false;
+
       }
     },
   },

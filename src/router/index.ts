@@ -36,6 +36,12 @@ const routes = [
     component: () => import('@/views/InformationCards.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/users',
+    name: 'Users',
+    component: () => import('@/views/Users.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
@@ -43,7 +49,6 @@ const router = createRouter({
   routes,
 })
 
-// Navigation guard - protects routes
 router.beforeEach((to, from, next) => {
   try {
     if (to.meta.requiresAuth && !authService.IsAuthenticated()) {

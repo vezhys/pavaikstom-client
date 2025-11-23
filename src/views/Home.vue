@@ -52,57 +52,16 @@
               <div class="stat-label">Your Information Cards</div>
             </div>
           </div>
-
-          <div class="quick-actions">
-            <h3 class="section-title">
-              <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-              </svg>
-              Quick Actions
-            </h3>
-            <div class="actions-grid">
-              <router-link to="/routes" class="action-card">
-                <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="12" y1="8" x2="12" y2="16"/>
-                  <line x1="8" y1="12" x2="16" y2="12"/>
-                </svg>
-                <span class="action-text">Create New Route</span>
-              </router-link>
-              <router-link to="/points-of-interest" class="action-card">
-                <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="12" y1="8" x2="12" y2="16"/>
-                  <line x1="8" y1="12" x2="16" y2="12"/>
-                </svg>
-                <span class="action-text">Add Point of Interest</span>
-              </router-link>
-              <router-link to="/information-cards" class="action-card">
-                <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="12" y1="8" x2="12" y2="16"/>
-                  <line x1="8" y1="12" x2="16" y2="12"/>
-                </svg>
-                <span class="action-text">Create Information Card</span>
-              </router-link>
-            </div>
-          </div>
         </template>
         <template v-else>
           <div class="stats-grid">
             <div class="stat-card">
-              <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
+              <Map class="stat-icon" stroke-width="2" />
               <div class="stat-value">{{ routeCount }}</div>
               <div class="stat-label">Overall Tour Routes</div>
             </div>
             <div class="stat-card">
-              <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
+              <Pin class="stat-icon" stroke-width="2" />
               <div class="stat-value">{{ poiCount }}</div>
               <div class="stat-label">Overall Points of Interest</div>
             </div>
@@ -142,10 +101,7 @@
 
           <div class="info-section">
             <h3>
-              <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
+              <Map class="icon-small" stroke-width="2" />
               Tour Routes
             </h3>
             <p>Create and manage comprehensive tour routes with multiple stops. Define the path, duration, and key highlights of your tours.</p>
@@ -153,10 +109,7 @@
 
           <div class="info-section">
             <h3>
-              <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
+              <Pin class="icon-small" stroke-width="2" />
               Points of Interest
             </h3>
             <p>Mark important locations along your routes. Add descriptions, images, and historical information about each point.</p>
@@ -164,10 +117,7 @@
 
           <div class="info-section">
             <h3>
-              <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
+              <FileText class="icon-small" stroke-width="2" />
               Information Cards
             </h3>
             <p>Create detailed information cards with rich content about landmarks, historical events, or local culture.</p>
@@ -181,8 +131,8 @@
               </svg>
               Access Levels
             </h3>
-            <p><strong>Managers:</strong> Can create, edit, and delete all content. Full administrative access to the system.</p>
-            <p><strong>Guests:</strong> Can view all public tours, routes, and points of interest but cannot make changes.</p>
+            <p><strong>Guides:</strong> Can create, edit, and delete all owned content.</p>
+            <p><strong>Guests:</strong> Can view all public tours, and points of interest but cannot make changes.</p>
           </div>
 
           <div class="info-footer">

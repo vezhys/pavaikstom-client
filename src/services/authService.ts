@@ -5,20 +5,19 @@ export const authService = {
   async login(username: any, password: any) {
     const response = await api.post('/Auth/login', { username, password })
     const { accessToken, refreshToken } = response.data
-    localStorage.setItem('token', accessToken)
+    localStorage.setItem('accessToken', accessToken)
     localStorage.setItem('refreshToken', refreshToken)
     return response.data
   },
 
   async logout() {
     localStorage.removeItem('token')
+    localStorage.removeItem('accessToken')
     const refreshToken = localStorage.getItem('refreshToken')
     localStorage.removeItem('refreshToken')
     const response = await api.post('/auth/logout', {refreshToken})
 
-
-  // Remove Axios default header if used
-     delete api.defaults.headers.common['Authorization'];
+    delete api.defaults.headers.common['Authorization'];
     return response.data
   },
   async register(username: string, email: string, password: string, role: string) {
@@ -40,10 +39,15 @@ export const authService = {
   },
 
   getToken() {
-    return localStorage.getItem('token')
+    return localStorage.getItem('accessToken')
   },
 
   async refresh(){
-     const response = await api.post('/refresh', {}, { withCredentials: true });
+      const oldRefreshToken = localStorage.getItem('refreshToken');
+      console.log("sending refresh token:" + oldRefreshToken)
+     const response = await api.post('/refresh', { refreshToken: oldRefreshToken });
+     const { accessToken, refreshToken } = response.data
+     localStorage.setItem('accessToken', accessToken)
+     localStorage.setItem('refreshToken', refreshToken)
   }
 }
