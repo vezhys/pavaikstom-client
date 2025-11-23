@@ -37,8 +37,8 @@
                 <button @click="viewPOIs(route.id)" class="btn btn-primary btn-sm" v-if="route.poiCount > 0">
                   View POIs
                 </button>
-                <button v-if="authStore.canManage && canEdit(route)" @click="openEditModal(route)"
-                  class="btn btn-secondary btn-sm">
+                <button v-if="(authStore.canManage && canEdit(route)) || authStore.canManageUsers"
+                  @click="openEditModal(route)" class="btn btn-secondary btn-sm">
                   Edit
                 </button>
                 <button v-if="authStore.canManage" @click="deleteRoute(route.id)" class="btn btn-danger btn-sm">
