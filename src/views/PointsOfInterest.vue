@@ -224,7 +224,7 @@ const savePoi = async () => {
       await poiService.create(form.value)
     }
     closeModal()
-    myPois.value.push(form.value)
+    await fetchOwnedPois()
     await fetchPois()
   } catch (err) {
     error.value = 'Failed to save point of interest'
