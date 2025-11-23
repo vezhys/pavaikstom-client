@@ -66,9 +66,9 @@
         <form @submit.prevent="saveRoute">
           <div class="form-group">
             <label>Route Name</label>
-            <input v-model="form.name" type="text" placeholder="e.g., Historic City Center Tour" maxlength="50"
+            <input v-model="form.name" type="text" placeholder="e.g., Historic City Center Tour" maxlength="20"
               required />
-            <small>{{ form.name.length }}/15</small>
+            <small>{{ form.name.length }}/20</small>
           </div>
           <div class="form-group">
             <label>Description</label>
@@ -88,8 +88,8 @@
 
             <label>Duration (hours)</label>
             <input type="number" v-model.number="form.duration" min="1" max="168" required />
-            <span v-if="form.duration && (form.duration < 1 || form.duration > 168)" class="text-danger">
-              Duration must be between 1 and 168 hours
+            <span v-if="form.duration && (form.duration < 1 || form.duration > 24)" class="text-danger">
+              Duration must be between 1 and 24 hours
             </span>
           </div>
           <ModalError v-model="modalError" />
