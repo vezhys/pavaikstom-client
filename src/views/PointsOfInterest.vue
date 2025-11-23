@@ -2,12 +2,7 @@
   <AppLayout>
     <PageCard title="Points of Interest">
       <template #actions>
-        <button
-          v-if="route.query.tourId"
-          @click="clearFilter"
-          class="btn btn-secondary"
-          style="margin-right: 8px"
-        >
+        <button v-if="route.query.tourId" @click="clearFilter" class="btn btn-secondary" style="margin-right: 8px">
           Show All
         </button>
         <button @click="openCreateModal" class="btn btn-primary">
@@ -46,15 +41,11 @@
             <td>{{ poi.cardCount || 0 }}</td>
             <td>
               <div class="table-actions">
-                <button
-                  @click="viewCards(poi.id)"
-                  class="btn btn-primary btn-sm"
-                  v-if="poi.cardCount > 0"
-                >
+                <button @click="viewCards(poi.id)" class="btn btn-primary btn-sm" v-if="poi.cardCount > 0">
                   View Cards
                 </button>
-                <button @click="openEditModal(poi)" class="btn btn-secondary btn-sm">Edit</button>
-                <button @click="deletePoi(poi.id)" class="btn btn-danger btn-sm">Delete</button>
+                <button v-if="canEdit(poi)" @click="openEditModal(poi)" class="btn btn-secondary btn-sm">Edit</button>
+                <button v-if="canEdit(poi)" @click="deletePoi(poi.id)" class="btn btn-danger btn-sm">Delete</button>
               </div>
             </td>
           </tr>
@@ -74,12 +65,7 @@
         <form @submit.prevent="savePoi">
           <div class="form-group">
             <label>Name</label>
-            <input
-              v-model="form.name"
-              type="text"
-              placeholder="e.g., Historic Cathedral"
-              required
-            />
+            <input v-model="form.name" type="text" placeholder="e.g., Historic Cathedral" required />
           </div>
           <div class="form-group">
             <label>Route</label>
@@ -116,6 +102,7 @@ const route = useRoute()
 const pois = ref([])
 const routes = ref([])
 const myRoutes = ref([])
+const myPois = ref([])
 const loading = ref(false)
 const error = ref('')
 const showModal = ref(false)
@@ -147,6 +134,30 @@ const fetchPois = async () => {
     loading.value = false
   }
 }
+
+const fetchOwnedPois = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    const tourId = route.query.tourId
+    if (tourId) {
+      // Filter by route if tourId is in query
+      const allPois = await poiService.getAll()
+      pois.value = allPois.filter((poi) => poi.tourId == tourId)
+    } else {
+      myPois.value = await poiService.getOwned()
+    }
+  } catch (err) {
+    error.value = 'Failed to load points of interest'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+}
+function canEdit(poi) {
+  return myPoys.value.some(t => t.id === poi.id)
+}
+
 
 // View info cards for a POI
 const viewCards = (poiId) => {

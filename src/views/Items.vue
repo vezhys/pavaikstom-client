@@ -117,6 +117,7 @@ const router = useRouter()
 
 const authStore = useAuthStore()
 const routes = ref([])
+const ownedTours = ref([])
 const loading = ref(false)
 const error = ref('')
 const showModal = ref(false)
@@ -148,7 +149,7 @@ const fetchOwnedRoutes = async () => {
   loading.value = true
   error.value = ''
   try {
-    routes.value = await itemService.getOwned()
+    ownedTours.value = await itemService.getOwned()
   } catch (err) {
     error.value = 'Failed to load owned routes'
     console.error(err)

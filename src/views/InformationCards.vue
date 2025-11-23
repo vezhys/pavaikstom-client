@@ -2,12 +2,7 @@
   <AppLayout>
     <PageCard title="Information Cards">
       <template #actions>
-        <button
-          v-if="route.query.pointId"
-          @click="clearFilter"
-          class="btn btn-secondary"
-          style="margin-right: 8px"
-        >
+        <button v-if="route.query.pointId" @click="clearFilter" class="btn btn-secondary" style="margin-right: 8px">
           Show All
         </button>
         <button @click="openCreateModal" class="btn btn-primary">
@@ -46,8 +41,10 @@
             <td>{{ getPoiName(card.pointId) }}</td>
             <td>
               <div class="table-actions">
-                <button @click="openEditModal(card)" class="btn btn-secondary btn-sm">Edit</button>
-                <button @click="deleteCard(card.id)" class="btn btn-danger btn-sm">Delete</button>
+                <button v-if="(canEdit(card))" @click="openEditModal(card)"
+                  class="btn btn-secondary btn-sm">Edit</button>
+                <button v-if="(canEdit(card))" @click="deleteCard(card.id)"
+                  class="btn btn-danger btn-sm">Delete</button>
               </div>
             </td>
           </tr>
@@ -67,21 +64,12 @@
         <form @submit.prevent="saveCard">
           <div class="form-group">
             <label>Title</label>
-            <input
-              v-model="form.title"
-              type="text"
-              placeholder="e.g., Historical Background"
-              required
-            />
+            <input v-model="form.title" type="text" placeholder="e.g., Historical Background" required />
           </div>
           <div class="form-group">
             <label>Content</label>
-            <textarea
-              v-model="form.text"
-              rows="5"
-              placeholder="Enter the information card content..."
-              required
-            ></textarea>
+            <textarea v-model="form.text" rows="5" placeholder="Enter the information card content..."
+              required></textarea>
           </div>
           <div class="form-group">
             <label>Point of Interest</label>
@@ -124,6 +112,7 @@ const error = ref('')
 const showModal = ref(false)
 const isEditing = ref(false)
 const saving = ref(false)
+const myCards = ref([])
 const form = ref({
   id: null,
   title: '',
@@ -149,6 +138,29 @@ const fetchCards = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const fetchOwnedCards = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    const pointId = route.query.pointId
+    if (pointId) {
+      // Filter by POI if poiId is in query
+      myCards.value = await informationCardService.getByPoiId(pointId)
+    } else {
+      myCards.value = await informationCardService.getOwned()
+    }
+  } catch (err) {
+    error.value = 'Failed to load information cards'
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
+}
+
+function canEdit(card) {
+  return myCards.value.some(t => t.id === card.id)
 }
 
 // Fetch all POIs for dropdown
@@ -237,6 +249,7 @@ onMounted(() => {
   fetchPois()
   fetchCards()
   fetchMyPois()
+  fetchOwnedCards()
 })
 
 // Clear filter
