@@ -159,7 +159,7 @@ const fetchOwnedCards = async () => {
   }
 }
 
-function canEdit(card) {
+const canEdit = (card) => {
   return myCards.value.some(t => t.id === card.id)
 }
 

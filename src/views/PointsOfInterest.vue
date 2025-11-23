@@ -155,13 +155,10 @@ const fetchOwnedPois = async () => {
     loading.value = false
   }
 }
-function canEdit(poi) {
+
+
+const canEdit = (poi) => {
   return myPois.value.some(t => t.id === poi.id)
-}
-
-
-const canEditButton = (poi) => {
-  return canEdit(poi)
 }
 
 

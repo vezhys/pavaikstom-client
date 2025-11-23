@@ -158,7 +158,7 @@ const fetchOwnedRoutes = async () => {
   }
 }
 
-function canEdit(tour) {
+const canEdit = (tour) => {
   return ownedTours.value.some(t => t.id === tour.id)
 }
 
